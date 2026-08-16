@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    container_name: bhuvanaweb
+    ports:
+      - "8080:80"
+
+  webhook:
+    build: ./webhook-server
+    container_name: bhuvanaweb_webhook
+    ports:
+      - "9000:9000"

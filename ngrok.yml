@@ -1,0 +1,9 @@
+version: "3"
+
+agent:
+  # Add your token locally with: ngrok config add-authtoken YOUR_TOKEN
+
+tunnels:
+  app:
+    addr: 8080
+    proto: http
