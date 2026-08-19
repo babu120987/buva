@@ -1,0 +1,254 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: buva
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buva-config
+  namespace: buva
+data:
+  POSTGRES_DB: buva
+  POSTGRES_USER: buva
+  DB_HOST: database
+  DB_PORT: "5432"
+  DB_NAME: buva
+  DB_USER: buva
+  PORT: "9000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: buva
+spec:
+  selector:
+    app: buva-database
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: buva-database
+  namespace: buva
+spec:
+  serviceName: database
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buva-database
+  template:
+    metadata:
+      labels:
+        app: buva-database
+    spec:
+      containers:
+        - name: postgres
+          image: docker.io/sarvah031220/buva-database:latest
+          imagePullPolicy: Always
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: buva-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: buva-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: POSTGRES_PASSWORD
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: buva
+spec:
+  selector:
+    app: buva-backend
+  ports:
+    - name: http
+      port: 9000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buva-backend
+  namespace: buva
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: buva-backend
+  template:
+    metadata:
+      labels:
+        app: buva-backend
+    spec:
+      initContainers:
+        - name: wait-for-database
+          image: docker.io/busybox:1.37
+          command:
+            - sh
+            - -c
+            - until nc -z database 5432; do echo "waiting for database"; sleep 2; done
+      containers:
+        - name: backend
+          image: docker.io/sarvah031220/buva-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: buva-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: POSTGRES_PASSWORD
+            - name: ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: ADMIN_API_KEY
+            - name: RAZORPAY_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: RAZORPAY_KEY_ID
+                  optional: true
+            - name: RAZORPAY_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: RAZORPAY_KEY_SECRET
+                  optional: true
+            - name: RAZORPAY_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: buva-secrets
+                  key: RAZORPAY_WEBHOOK_SECRET
+                  optional: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: buva
+spec:
+  type: NodePort
+  selector:
+    app: buva-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buva-frontend
+  namespace: buva
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: buva-frontend
+  template:
+    metadata:
+      labels:
+        app: buva-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: docker.io/sarvah031220/buva-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

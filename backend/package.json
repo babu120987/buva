@@ -1,0 +1,9 @@
+{
+  "name": "buva-ecommerce-api",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}

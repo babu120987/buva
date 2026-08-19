@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Buva Admin — Orders</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main>
+    <section class="login-view" data-login-view>
+      <form class="login-card" data-login-form>
+        <a class="brand" href="/">BU<span>V</span>A</a>
+        <p class="eyebrow">Private workspace</p>
+        <h1>Admin access</h1>
+        <p>Enter the access key configured for this environment.</p>
+        <label for="admin-key">Access key</label>
+        <input id="admin-key" name="key" type="password" autocomplete="current-password" required autofocus>
+        <p class="form-error" data-login-error role="alert" hidden></p>
+        <button type="submit">Open dashboard</button>
+      </form>
+    </section>
+
+    <section class="dashboard" data-dashboard hidden>
+      <header class="topbar">
+        <div><a class="brand" href="/">BU<span>V</span>A</a><span class="admin-label">Admin</span></div>
+        <nav class="section-nav" aria-label="Admin sections">
+          <button class="active" type="button" data-admin-view="orders">Orders</button>
+          <button type="button" data-admin-view="products">Products</button>
+        </nav>
+        <button class="text-button" type="button" data-logout>Lock dashboard</button>
+      </header>
+
+      <div class="workspace" data-view-panel="orders">
+        <div class="page-heading">
+          <div><p class="eyebrow">Order management</p><h1>Orders</h1></div>
+          <button class="refresh-button" type="button" data-refresh>Refresh</button>
+        </div>
+
+        <section class="stats" aria-label="Order summary">
+          <article><span>Total orders</span><strong data-stat="totalOrders">—</strong></article>
+          <article><span>Pending</span><strong data-stat="pendingOrders">—</strong></article>
+          <article><span>To fulfil</span><strong data-stat="fulfilmentOrders">—</strong></article>
+          <article><span>Active revenue</span><strong data-stat="revenuePaise">—</strong></article>
+        </section>
+
+        <section class="orders-panel">
+          <div class="orders-tools">
+            <div class="filters" aria-label="Filter orders by status">
+              <button class="filter active" type="button" data-status="">All</button>
+              <button class="filter" type="button" data-status="pending">Pending</button>
+              <button class="filter" type="button" data-status="confirmed">Confirmed</button>
+              <button class="filter" type="button" data-status="packed">Packed</button>
+              <button class="filter" type="button" data-status="shipped">Shipped</button>
+              <button class="filter" type="button" data-status="delivered">Delivered</button>
+              <button class="filter" type="button" data-status="cancelled">Cancelled</button>
+              <button class="filter" type="button" data-status="returned">Returned</button>
+            </div>
+            <form class="search" data-search-form>
+              <label class="sr-only" for="order-search">Search orders</label>
+              <input id="order-search" name="search" type="search" placeholder="Order, customer or email">
+              <button type="submit">Search</button>
+            </form>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody data-orders-body><tr><td colspan="6" class="empty-state">Loading orders…</td></tr></tbody>
+            </table>
+          </div>
+          <p class="results-note" data-results-note></p>
+        </section>
+      </div>
+
+      <div class="workspace" data-view-panel="products" hidden>
+        <div class="page-heading">
+          <div><p class="eyebrow">Catalogue management</p><h1>Products</h1></div>
+          <button class="refresh-button primary" type="button" data-product-create>New product</button>
+        </div>
+
+        <section class="stats" aria-label="Catalogue summary">
+          <article><span>Total products</span><strong data-product-stat="totalProducts">—</strong></article>
+          <article><span>Active</span><strong data-product-stat="activeProducts">—</strong></article>
+          <article><span>Low stock</span><strong data-product-stat="lowStockProducts">—</strong></article>
+          <article><span>Available units</span><strong data-product-stat="availableUnits">—</strong></article>
+        </section>
+
+        <section class="orders-panel">
+          <div class="orders-tools">
+            <div class="filters" aria-label="Filter products">
+              <button class="filter active" type="button" data-product-active="all">All</button>
+              <button class="filter" type="button" data-product-active="true">Active</button>
+              <button class="filter" type="button" data-product-active="false">Archived</button>
+              <button class="filter" type="button" data-product-low-stock>Low stock</button>
+            </div>
+            <form class="search" data-product-search-form>
+              <label class="sr-only" for="product-search">Search products</label>
+              <input id="product-search" name="search" type="search" placeholder="Product, SKU or slug">
+              <button type="submit">Search</button>
+            </form>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price · ₹</th><th>Inventory</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody data-products-body><tr><td colspan="7" class="empty-state">Loading products…</td></tr></tbody>
+            </table>
+          </div>
+          <p class="results-note" data-product-results-note></p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="detail-shell" data-detail-shell>
+    <button class="detail-overlay" type="button" data-detail-close aria-label="Close order details"></button>
+    <aside class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
+      <div data-detail-content></div>
+    </aside>
+  </div>
+
+  <div class="toast" data-toast role="status"></div>
+  <script src="admin.js"></script>
+</body>
+</html>
