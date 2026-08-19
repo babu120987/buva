@@ -1,0 +1,21 @@
+# Jenkins / backups
+Poseify-workspace/
+*.tar
+*.tar.gz
+*.zip
+Poseify-workspace/
+*.tar.gz
+
+# Docker junk
+*.log
+node_modules/
+java-maven-sonar-argocd-helm-k8s
+Poseify-workspace/
+*.tar.gz
+*.zip
+*.log
+node_modules/
+.env
+.DS_Store
+*.bak
+ngrok.local.yml
