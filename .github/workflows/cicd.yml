@@ -9,34 +9,59 @@ on:
       - main
 
 env:
-  DOCKERHUB_USERNAME: sarvah031220
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: babu120987
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
 
   frontend:
-    name: Build Frontend
+    name: Build and Push Frontend
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Build frontend image
-        run: |
-          docker build \
-            -t ${{ env.DOCKERHUB_USERNAME }}/buva-frontend:${{ github.sha }} \
-            ./frontend
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_OWNER }}/buva-frontend:${{ github.sha }}
+            ghcr.io/${{ env.IMAGE_OWNER }}/buva-frontend:latest
 
   backend:
-    name: Build Backend
+    name: Build and Push Backend
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Build backend image
-        run: |
-          docker build \
-            -t ${{ env.DOCKERHUB_USERNAME }}/buva-backend:${{ github.sha }} \
-            ./backend
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_OWNER }}/buva-backend:${{ github.sha }}
+            ghcr.io/${{ env.IMAGE_OWNER }}/buva-backend:latest
