@@ -1,0 +1,42 @@
+name: Buva CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DOCKERHUB_USERNAME: sarvah031220
+
+jobs:
+
+  frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            -t ${{ env.DOCKERHUB_USERNAME }}/buva-frontend:${{ github.sha }} \
+            ./frontend
+
+  backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t ${{ env.DOCKERHUB_USERNAME }}/buva-backend:${{ github.sha }} \
+            ./backend
