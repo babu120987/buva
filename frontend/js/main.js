@@ -350,6 +350,7 @@ const accountAuthMarkup = (mode = 'login') => mode === 'register' ? `
     <div class="field"><label>Password</label><input name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></div>
     <p class="checkout-error" data-account-error role="alert" hidden></p>
     <button class="button" type="submit">Sign in</button>
+    <button class="button google-login-button" type="button" data-google-login>Continue with Google</button>
     <button class="account-switch" type="button" data-account-mode="register">New to Buva? Create account</button>
   </form>`;
 
@@ -657,6 +658,16 @@ document.addEventListener('submit', async (event) => {
   }
 });
 
+document.addEventListener('click', (event) => {
+  const googleButton = event.target.closest('[data-google-login]');
+  if (!googleButton) return;
+
+  googleButton.disabled = true;
+  googleButton.textContent = 'Connecting to Google…';
+
+  window.location.href = '/api/auth/google';
+});
+
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return;
   if (document.body.classList.contains('checkout-open')) closeCheckout();
@@ -664,8 +675,36 @@ document.addEventListener('keydown', (event) => {
   else if (document.body.classList.contains('cart-open')) closeCart();
 });
 
+const handleGoogleCallback = async () => {
+  const params = new URLSearchParams(window.location.search);
+  const googleSession = params.get('google_session');
+
+  if (!googleSession) return;
+
+  customerToken = googleSession;
+  sessionStorage.setItem(accountStorageKey, customerToken);
+
+  params.delete('google_session');
+
+  const cleanUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, document.title, cleanUrl);
+
+  try {
+    await loadAccount();
+    renderAccount();
+    showToast('Welcome to Buva');
+  } catch (error) {
+    customerToken = '';
+    sessionStorage.removeItem(accountStorageKey);
+    showToast(error.message || 'Google sign-in failed');
+  }
+};
+
+handleGoogleCallback().catch((error) => {
+  console.error('Google callback handling failed:', error);
+});
+
 Promise.all([
   restoreCart(),
-  loadAccount(),
   apiRequest('/api/payments/config').then((config) => { paymentConfig = config; }).catch(() => {})
 ]);
