@@ -2,7 +2,19 @@ import express from "express";
 import pg from "pg";
 import crypto from "node:crypto";
 import { promisify } from "node:util";
+import { OAuth2Client } from "google-auth-library";
+const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
+const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL || "";
 
+const googleOAuthClient =
+  googleClientId && googleClientSecret && googleCallbackUrl
+    ? new OAuth2Client(
+        googleClientId,
+        googleClientSecret,
+        googleCallbackUrl
+      )
+    : null;
 const { Pool } = pg;
 const app = express();
 const port = Number(process.env.PORT || 9000);
@@ -412,6 +424,116 @@ const getAdminOrder = async (identifier, client = pool) => {
 
   return { ...orderResult.rows[0], items: itemsResult.rows };
 };
+
+
+app.get("/api/auth/google", asyncRoute(async (_request, response) => {
+  if (!googleOAuthClient) {
+    throw new ApiError(503, "Google sign-in is not configured");
+  }
+
+  const url = googleOAuthClient.generateAuthUrl({
+    access_type: "online",
+    scope: ["openid", "email", "profile"],
+    prompt: "select_account"
+  });
+
+  response.redirect(url);
+}));
+
+app.get("/api/auth/google/callback", asyncRoute(async (request, response) => {
+  if (!googleOAuthClient) {
+    throw new ApiError(503, "Google sign-in is not configured");
+  }
+
+  const code = parseText(request.query.code, "Google authorization code", {
+    min: 1,
+    max: 4096
+  });
+
+  const { tokens } = await googleOAuthClient.getToken(code);
+  if (!tokens.id_token) {
+    throw new ApiError(401, "Google did not return an ID token");
+  }
+
+  const ticket = await googleOAuthClient.verifyIdToken({
+    idToken: tokens.id_token,
+    audience: googleClientId
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+    throw new ApiError(401, "Google account email could not be verified");
+  }
+
+  const googleSubject = payload.sub;
+  const email = payload.email.toLowerCase();
+  const fullName = String(payload.name || email.split("@")[0]).trim();
+
+  let customer;
+
+  const existingByGoogle = await pool.query(`
+    SELECT id, email, phone, full_name AS "fullName", active
+    FROM customers
+    WHERE google_subject = $1
+  `, [googleSubject]);
+
+  if (existingByGoogle.rowCount > 0) {
+    customer = existingByGoogle.rows[0];
+
+    if (!customer.active) {
+      throw new ApiError(403, "Customer account is inactive");
+    }
+  } else {
+    const existingByEmail = await pool.query(`
+      SELECT id, email, phone, full_name AS "fullName", active, google_subject
+      FROM customers
+      WHERE email = $1
+    `, [email]);
+
+    if (existingByEmail.rowCount > 0) {
+      customer = existingByEmail.rows[0];
+
+      if (!customer.active) {
+        throw new ApiError(403, "Customer account is inactive");
+      }
+
+      await pool.query(`
+        UPDATE customers
+        SET google_subject = $1,
+            updated_at = NOW()
+        WHERE id = $2
+      `, [googleSubject, customer.id]);
+
+      customer.google_subject = googleSubject;
+    } else {
+      const result = await pool.query(`
+        INSERT INTO customers (
+          email,
+          full_name,
+          google_subject,
+          password_hash
+        )
+        VALUES ($1, $2, $3, NULL)
+        RETURNING
+          id,
+          email,
+          phone,
+          full_name AS "fullName",
+          active
+      `, [email, fullName, googleSubject]);
+
+      customer = result.rows[0];
+    }
+  }
+
+  const session = await createCustomerSession(customer.id);
+
+  const frontendUrl = "https://bhuva.duckdns.org";
+  const token = encodeURIComponent(session.token);
+
+  response.redirect(`${frontendUrl}/?google_session=${token}`);
+}));
 
 app.post("/api/auth/register", asyncRoute(async (request, response) => {
   const identity = parseAccountIdentity(request.body);
