@@ -451,7 +451,7 @@ document.addEventListener('click', async (event) => {
     return;
   }
 
-  if (event.target.closest('.detail-drawer')) return;
+  if (event.target.closest(".detail-drawer") && !event.target.closest("[data-next-status]")) return;
   const viewButton = event.target.closest('[data-admin-view]');
   if (viewButton) {
     try { await switchAdminView(viewButton.dataset.adminView); } catch (error) { showToast(error.message); }
