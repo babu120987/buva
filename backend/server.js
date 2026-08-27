@@ -1,8 +1,11 @@
 import express from "express";
 import pg from "pg";
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { promisify } from "node:util";
 import { OAuth2Client } from "google-auth-library";
+import multer from "multer";
 const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
 const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL || "";
@@ -106,6 +109,13 @@ const asyncRoute = (handler) => async (request, response, next) => {
 };
 
 const secureHash = (value) => crypto.createHash("sha256").update(value).digest();
+class ApiError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+    this.name = "ApiError";
+  }
+}
 
 const requireAdmin = (request, response, next) => {
   if (!adminApiKey) {
@@ -118,13 +128,53 @@ const requireAdmin = (request, response, next) => {
   next();
 };
 
-class ApiError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
-}
+const uploadsDir = path.join(process.cwd(), "uploads");
 
+await fs.promises.mkdir(uploadsDir, { recursive: true });
+app.use("/uploads", express.static(uploadsDir));
+
+const allowedImageTypes = new Map([
+  ["image/jpeg", ".jpg"],
+  ["image/png", ".png"],
+  ["image/webp", ".webp"]
+]);
+
+const imageStorage = multer.diskStorage({
+  destination: (_request, _file, callback) => {
+    callback(null, uploadsDir);
+  },
+
+  filename: (_request, file, callback) => {
+    const extension = allowedImageTypes.get(file.mimetype);
+
+    if (!extension) {
+      return callback(
+        new ApiError(400, "Only JPEG, PNG and WebP images are allowed")
+      );
+    }
+
+    callback(null, `${crypto.randomUUID()}${extension}`);
+  }
+});
+
+const uploadProductImages = multer({
+  storage: imageStorage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 10
+  },
+
+  fileFilter: (_request, file, callback) => {
+    if (!allowedImageTypes.has(file.mimetype)) {
+      return callback(
+        new ApiError(400, "Only JPEG, PNG and WebP images are allowed")
+      );
+    }
+
+    callback(null, true);
+  }
+});
 const isUuid = (value) => typeof value === "string"
   && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 
@@ -1249,6 +1299,23 @@ const adminProductSelect = `
 `;
 
 app.use("/api/admin", requireAdmin);
+
+app.post(
+  "/api/admin/upload-image",
+  uploadProductImages.single("image"),
+  asyncRoute(async (request, response) => {
+    if (!request.file) {
+      throw new ApiError(400, "Image file is required");
+    }
+
+    response.status(201).json({
+      url: `/uploads/${request.file.filename}`,
+      filename: request.file.filename,
+      mimetype: request.file.mimetype,
+      size: request.file.size
+    });
+  })
+);
 
 const getAdminProduct = async (productId, client = pool) => {
   const result = await client.query(`${adminProductSelect} WHERE p.id = $1`, [productId]);
