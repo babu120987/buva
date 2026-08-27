@@ -111,6 +111,35 @@ const adminRequest = async (path, options = {}) => {
   return payload;
 };
 
+const uploadProductImage = async (file) => {
+  if (!file) throw new Error('Please choose an image.');
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch('/api/admin/upload-image', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'X-Admin-Key': adminKey
+    },
+    body: formData
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (response.status === 401) {
+    showLogin('The access key is incorrect.');
+    throw new Error(payload.error || 'Access denied');
+  }
+
+  if (!response.ok) {
+    throw new Error(payload.error || `Image upload failed with status ${response.status}`);
+  }
+
+  return payload;
+};
+
 const renderSummary = (summary) => {
   Object.entries(summary).forEach(([key, value]) => {
     const root = document.querySelector(`[data-stat="${key}"]`);
@@ -214,6 +243,10 @@ const productFormMarkup = (product = null) => {
         <label>Low-stock threshold<input name="lowStockThreshold" type="number" value="${value('lowStockThreshold', 5)}" min="0" max="1000000" required></label>
         <label class="full">Short description<input name="shortDescription" value="${value('shortDescription')}" maxlength="240"></label>
         <label class="full">Description<textarea name="description" maxlength="4000">${value('description')}</textarea></label>
+        <label class="full">Product image
+          <input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
+          <span class="product-form-help">Choose a JPG, PNG, or WebP image. It will be uploaded when you save the product.</span>
+        </label>
         <label class="full">Image URL<input name="imageUrl" value="${value('imageUrl', '/perfume.jpg')}" required maxlength="500"></label>
         <label class="full">Image alt text<input name="imageAlt" value="${value('imageAlt')}" maxlength="240"></label>
       </div>
@@ -372,6 +405,29 @@ document.addEventListener('submit', async (event) => {
   }
 
   const fields = new FormData(form);
+
+  const imageFile = fields.get('imageFile');
+  if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+    try {
+      submit.disabled = true;
+      submit.textContent = 'Uploading image…';
+
+      const uploadResult = await uploadProductImage(imageFile);
+
+      if (!uploadResult.url) {
+        throw new Error('Image upload succeeded but no image URL was returned.');
+      }
+
+      form.elements.namedItem('imageUrl').value = uploadResult.url;
+      fields.set('imageUrl', uploadResult.url);
+    } catch (error) {
+      showProductFormError(form, error.message || 'Image upload failed.');
+      submit.disabled = false;
+      submit.textContent = form.dataset.productId ? 'Save changes' : 'Create product';
+      return;
+    }
+  }
+
   const price = Number(fields.get('price'));
   const compareAtPriceText = String(fields.get('compareAtPrice') || '').trim();
   const compareAtPrice = compareAtPriceText ? Number(compareAtPriceText) : null;
