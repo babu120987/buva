@@ -708,3 +708,40 @@ Promise.all([
   restoreCart(),
   apiRequest('/api/payments/config').then((config) => { paymentConfig = config; }).catch(() => {})
 ]);
+
+const loadStoryProductImages = async () => {
+  const storyImages = document.querySelectorAll('[data-story-product]');
+  if (!storyImages.length) return;
+
+  try {
+    const response = await fetch('/api/products', {
+      headers: { Accept: 'application/json' }
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const products = data.products || [];
+
+    storyImages.forEach((image) => {
+      const product = products.find(
+        (item) => item.name === image.dataset.storyProduct
+      );
+
+      if (product?.imageUrl) {
+        if (image.tagName === 'IMG') {
+          image.style.backgroundImage = `url("${product.imageUrl}")`;
+          if (product.imageAlt) {
+            image.alt = product.imageAlt;
+          }
+        } else {
+          image.style.backgroundImage = `url("${product.imageUrl}")`;
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Story product images failed to load:', error);
+  }
+};
+
+loadStoryProductImages();
