@@ -1574,6 +1574,13 @@ app.patch("/api/admin/orders/:identifier/status", asyncRoute(async (request, res
       if (!allowedOrderTransitions[current.status].has(nextStatus)) {
         throw new ApiError(409, `Order cannot move from ${current.status} to ${nextStatus}`);
       }
+      if (
+        current.payment_method === "razorpay"
+        && current.payment_status !== "paid"
+        && ["confirmed", "packed", "shipped", "delivered"].includes(nextStatus)
+      ) {
+        throw new ApiError(409, "Razorpay payment must be paid before fulfilling this order");
+      }
       if ((nextStatus === "cancelled" || nextStatus === "returned")
         && current.payment_method === "razorpay"
         && current.payment_status === "paid") {
