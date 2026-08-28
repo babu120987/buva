@@ -297,9 +297,15 @@ const renderDetail = (order, allowedTransitions) => {
     .filter(Boolean).map(escapeHtml).join('<br>');
   const discount = order.discountPaise > 0
     ? `<div><span>Discount${order.couponCode ? ` · ${escapeHtml(order.couponCode)}` : ''}</span><strong>−${formatPrice(order.discountPaise)}</strong></div>` : '';
-  const actions = allowedTransitions.length
-    ? allowedTransitions.map((status) => `<button class="status-action${status === 'cancelled' || status === 'returned' ? ' danger' : ''}" type="button" data-next-status="${status}" data-order-id="${escapeHtml(order.id)}">Mark ${escapeHtml(status)}</button>`).join('')
-    : '<p class="address">This order has reached a final status.</p>';
+  const paymentBlocked = order.paymentMethod === 'razorpay' && order.paymentStatus !== 'paid';
+  const visibleTransitions = paymentBlocked
+    ? allowedTransitions.filter((status) => !['confirmed', 'packed', 'shipped', 'delivered'].includes(status))
+    : allowedTransitions;
+  const actions = visibleTransitions.length
+    ? visibleTransitions.map((status) => `<button class="status-action${status === 'cancelled' || status === 'returned' ? ' danger' : ''}" type="button" data-next-status="${status}" data-order-id="${escapeHtml(order.id)}">Mark ${escapeHtml(status)}</button>`).join('')
+    : paymentBlocked
+      ? '<p class="address">Razorpay payment is pending. This order cannot be fulfilled until payment is successful.</p>'
+      : '<p class="address">This order has reached a final status.</p>';
 
   detailContent.innerHTML = `
     <div class="detail-head"><div><p class="eyebrow">Order details</p><h2 id="detail-title">${escapeHtml(order.orderNumber)}</h2></div><button class="close-button" type="button" data-detail-close aria-label="Close">×</button></div>
