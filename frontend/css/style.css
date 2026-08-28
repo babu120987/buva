@@ -142,9 +142,6 @@ p { color: var(--muted); }
 .category-card > div { position: relative; z-index: 1; }
 .category-card h3 { margin: 0; font-size: 2.4rem; }
 .category-card p { margin-bottom: 0; }
-.category-floral { background-image: url('../img/buva/madurai-jasmine.png'); }
-.category-fresh { background-image: url('../img/buva/fresh-vetiver.png'); }
-.category-woody { background-image: url('../img/buva/rose-oud.png'); }
 .feature-bar { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
 .feature-item { padding: 28px 20px; text-align: center; border-right: 1px solid var(--line); }
 .feature-item:last-child { border-right: 0; }

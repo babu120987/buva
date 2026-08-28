@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "16"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"buva-backend","namespace":"buva"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"buva-backend"}},"template":{"metadata":{"labels":{"app":"buva-backend"}},"spec":{"containers":[{"env":[{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"POSTGRES_PASSWORD","name":"buva-secrets"}}},{"name":"ADMIN_API_KEY","valueFrom":{"secretKeyRef":{"key":"ADMIN_API_KEY","name":"buva-secrets"}}},{"name":"RAZORPAY_KEY_ID","valueFrom":{"secretKeyRef":{"key":"RAZORPAY_KEY_ID","name":"buva-secrets","optional":true}}},{"name":"RAZORPAY_KEY_SECRET","valueFrom":{"secretKeyRef":{"key":"RAZORPAY_KEY_SECRET","name":"buva-secrets","optional":true}}},{"name":"RAZORPAY_WEBHOOK_SECRET","valueFrom":{"secretKeyRef":{"key":"RAZORPAY_WEBHOOK_SECRET","name":"buva-secrets","optional":true}}}],"envFrom":[{"configMapRef":{"name":"buva-config"}}],"image":"ghcr.io/babu120987/buva-backend:latest","imagePullPolicy":"Always","livenessProbe":{"initialDelaySeconds":20,"periodSeconds":10,"tcpSocket":{"port":"http"}},"name":"backend","ports":[{"containerPort":9000,"name":"http"}],"readinessProbe":{"initialDelaySeconds":5,"periodSeconds":5,"tcpSocket":{"port":"http"}},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/app/uploads","name":"product-images"}]}],"initContainers":[{"command":["sh","-c","until nc -z database 5432; do echo \"waiting for database\"; sleep 2; done"],"image":"docker.io/busybox:1.37","name":"wait-for-database"}],"volumes":[{"name":"product-images","persistentVolumeClaim":{"claimName":"buva-product-images"}}]}}}}
+  creationTimestamp: "2026-08-20T03:19:25Z"
+  generation: 16
+  name: buva-backend
+  namespace: buva
+  resourceVersion: "9052216"
+  uid: 9c25d049-7333-412b-9ee2-dcdcc29a93d7
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: buva-backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-08-22T10:49:06Z"
+      creationTimestamp: null
+      labels:
+        app: buva-backend
+    spec:
+      containers:
+      - env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: buva-secrets
+        - name: ADMIN_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: ADMIN_API_KEY
+              name: buva-secrets
+        - name: RAZORPAY_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: RAZORPAY_KEY_ID
+              name: buva-secrets
+              optional: true
+        - name: RAZORPAY_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: RAZORPAY_KEY_SECRET
+              name: buva-secrets
+              optional: true
+        - name: RAZORPAY_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: RAZORPAY_WEBHOOK_SECRET
+              name: buva-secrets
+              optional: true
+        - name: GOOGLE_CALLBACK_URL
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CALLBACK_URL
+              name: buva-google-oauth
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CLIENT_ID
+              name: buva-google-oauth
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CLIENT_SECRET
+              name: buva-google-oauth
+        envFrom:
+        - configMapRef:
+            name: buva-config
+        image: ghcr.io/babu120987/buva-backend:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 1
+        name: backend
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/uploads
+          name: product-images
+        - mountPath: /uploads
+          name: product-images
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nc -z database 5432; do echo "waiting for database"; sleep 2; done
+        env:
+        - name: GOOGLE_CALLBACK_URL
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CALLBACK_URL
+              name: buva-google-oauth
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CLIENT_ID
+              name: buva-google-oauth
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: GOOGLE_CLIENT_SECRET
+              name: buva-google-oauth
+        image: docker.io/busybox:1.37
+        imagePullPolicy: IfNotPresent
+        name: wait-for-database
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: product-images
+        persistentVolumeClaim:
+          claimName: buva-product-images
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2026-08-27T14:11:12Z"
+    lastUpdateTime: "2026-08-27T14:11:12Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-08-20T03:19:25Z"
+    lastUpdateTime: "2026-08-27T15:38:18Z"
+    message: ReplicaSet "buva-backend-6bd5df9f4d" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 16
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

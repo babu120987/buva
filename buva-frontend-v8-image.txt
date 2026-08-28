@@ -1,0 +1,67 @@
+[
+    {
+        "Id": "sha256:f7a1df53e5378729cfc492e59e98fa76529b678b5c79a70c9a485167d107db40",
+        "RepoTags": [
+            "localhost:5000/buva-frontend:v8"
+        ],
+        "RepoDigests": [
+            "localhost:5000/buva-frontend@sha256:f7a1df53e5378729cfc492e59e98fa76529b678b5c79a70c9a485167d107db40"
+        ],
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-08-28T09:58:58.842115711Z",
+        "Config": {
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.31.4",
+                "PKG_RELEASE=1",
+                "DYNPKG_RELEASE=1",
+                "NJS_VERSION=1.0.0",
+                "NJS_RELEASE=1",
+                "ACME_VERSION=0.4.1"
+            ],
+            "Entrypoint": [
+                "/docker-entrypoint.sh"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "WorkingDir": "/",
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+            },
+            "StopSignal": "SIGQUIT",
+            "ArgsEscaped": true
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 33117243,
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:34884abbe92863fce933ed7c39c0e045631af0ed86d5cc0dfbdf9fdca426ce3c",
+                "sha256:1c4d71cf6bfef3c94fb82a48b0d07fdcf59b1ace1b5658626bd4f12fbff717f5",
+                "sha256:18ca587a5d44f4cb68d531073968e5ffecef87c3c814c7c301ec8fdbbf37c323",
+                "sha256:e3b86476d58eb1d9373d874cc782eaa8af0109c25aadd43b93a8ebe6a42ea578",
+                "sha256:31e777702b009cdaa235515acb51a58ad43edd5e4beb52ce77013db081066b88",
+                "sha256:63c800442e2af6afe7dbbbbb0c90ce5df293fd6c9849e90ced270d0607d44cca",
+                "sha256:628c86fdf4c1dcb7c17e0b405a957dba43587f19923bad06e457815a90a458a6",
+                "sha256:edc23e36f952bfbf5b2bb3a9d2d1f3a5145ab4c6909888e2b3c16bbb3836226e",
+                "sha256:f77c779d0fcb4a6c4509f3370e36e529fee28ce587e13f1591722e6d42809c1c",
+                "sha256:425d4e852c5ff38fc2cb1a45962340f867e67c90c33f89de669c185df83e9b70"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-08-28T09:59:02.661234953Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:f7a1df53e5378729cfc492e59e98fa76529b678b5c79a70c9a485167d107db40",
+            "size": 856
+        }
+    }
+]

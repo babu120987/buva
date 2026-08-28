@@ -1,0 +1,14 @@
+localhost:5000/buva-frontend:v8 f7a1df53e537 108MB
+ghcr.io/babu120987/buva-backend:latest f3521ffa6e09 266MB
+ghcr.io/babu120987/buva-frontend:20260827-coastal-vetiver 7141014efd9e 108MB
+ghcr.io/babu120987/buva-frontend:20260822-favicon b1a992867b06 108MB
+ghcr.io/babu120987/buva-backend:20260822-google-oauth 8e03f5b1153f 265MB
+ghcr.io/babu120987/buva-frontend:latest da625e5e2377 108MB
+ghcr.io/babu120987/buva-frontend:20260821-adminfix ca070fa6de62 108MB
+ghcr.io/babu120987/buva-frontend:20260820-2308 1a48cef50c40 108MB
+ghcr.io/babu120987/buva-backend:20260820-2308 4a3adb7d1b0f 245MB
+buva-backend:test ada1671bd3ee 245MB
+buva-frontend:test 4dcfe51c25cf 107MB
+sarvah031220/buva-database:latest 099b5dd454f1 419MB
+sarvah031220/buva-backend:latest 8b6ce5d3b564 212MB
+sarvah031220/buva-frontend:latest c0a9273e3fb4 108MB
