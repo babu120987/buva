@@ -730,7 +730,7 @@ const loadStoryProductImages = async () => {
 
       if (product?.imageUrl) {
         if (image.tagName === 'IMG') {
-          image.style.backgroundImage = `url("${product.imageUrl}")`;
+          image.src = product.imageUrl;
           if (product.imageAlt) {
             image.alt = product.imageAlt;
           }
