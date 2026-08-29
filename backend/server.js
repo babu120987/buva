@@ -1102,7 +1102,7 @@ app.post("/api/carts/:sessionToken/checkout", asyncRoute(async (request, respons
     return { order, payment };
   });
 
-  await sendEmail({
+   sendEmail({
     to: result.order.email,
     subject: `Order received - ${result.order.orderNumber}`,
     text: [
