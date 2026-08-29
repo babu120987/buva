@@ -6,6 +6,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { OAuth2Client } from "google-auth-library";
 import multer from "multer";
+import nodemailer from "nodemailer";
 const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
 const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL || "";
@@ -19,6 +20,41 @@ const googleOAuthClient =
       )
     : null;
 const { Pool } = pg;
+const gmailUser = process.env.GMAIL_USER || "";
+const gmailAppPassword = process.env.GMAIL_APP_PASSWORD || "";
+
+const mailTransporter =
+  gmailUser && gmailAppPassword
+    ? nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser,
+          pass: gmailAppPassword
+        }
+      })
+    : null;
+
+const sendEmail = async ({ to, subject, text, html }) => {
+  if (!mailTransporter) {
+    console.warn("Email is not configured");
+    return;
+  }
+
+  try {
+    await mailTransporter.sendMail({
+      from: `"Buva" <${gmailUser}>`,
+      to,
+      subject,
+      text,
+      html
+    });
+
+    console.log(`Email sent to ${to}: ${subject}`);
+  } catch (error) {
+    console.error(`Failed to send email to ${to}:`, error);
+  }
+};
+
 const app = express();
 const port = Number(process.env.PORT || 9000);
 const adminApiKey = process.env.ADMIN_API_KEY || "";
@@ -604,9 +640,10 @@ app.post("/api/auth/register", asyncRoute(async (request, response) => {
     const session = await createCustomerSession(customerResult.rows[0].id, client);
     return { customer: customerResult.rows[0], session };
   });
+
+
   response.status(201).json(result);
 }));
-
 app.post("/api/auth/login", asyncRoute(async (request, response) => {
   const identifier = parseText(request.body?.identifier || request.body?.email, "Email or phone", { max: 254 });
   const password = parsePassword(request.body?.password);
@@ -1063,6 +1100,30 @@ app.post("/api/carts/:sessionToken/checkout", asyncRoute(async (request, respons
       currency: "INR"
     } : null;
     return { order, payment };
+  });
+
+  await sendEmail({
+    to: result.order.email,
+    subject: `Order received - ${result.order.orderNumber}`,
+    text: [
+      `Thank you for your order, ${result.order.customerName}.`,
+      ``,
+      `Order number: ${result.order.orderNumber}`,
+      `Payment method: ${result.order.paymentMethod}`,
+      `Payment status: ${result.order.paymentStatus}`,
+`Total: INR ${(result.order.totalPaise / 100).toFixed(2)}`,
+      `Thank you for choosing Buva.`
+    ].join("\n"),
+    html: `
+      <h2>Thank you for your order, ${result.order.customerName}!</h2>
+      <p>We have received your order successfully.</p>
+      <p><strong>Order number:</strong> ${result.order.orderNumber}</p>
+      <p><strong>Payment method:</strong> ${result.order.paymentMethod}</p>
+      <p><strong>Payment status:</strong> ${result.order.paymentStatus}</p>
+      <p><strong>Total:</strong> ₹${(result.order.totalPaise / 100).toFixed(2)}</p>
+      <p>We will process your order shortly.</p>
+      <p>Thank you for choosing Buva.</p>
+    `
   });
 
   response.status(201).json(result);
