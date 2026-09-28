@@ -17,3 +17,7 @@ Current capabilities:
 - catalogue metrics, active/archived and low-stock filters, and product search
 - product creation and editing for merchandising, pricing, imagery and stock
 - guarded inventory updates that cannot undercut currently reserved units
+- scheduled home/shop banner management and coupon activation
+- downloadable CSV order exports
+- courier tracking details for customer order updates
+- verified-purchase review moderation and support ticket resolution

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View and print your Buva invoices.">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url=index.html#account">
+  <script>location.replace('index.html#account');</script>
+  <title>Your Invoices — Buva Chennai</title>
+  <link rel="stylesheet" href="css/style.css?v=20260926-web1">
+  <link rel="stylesheet" href="css/invoices.css?v=20260926-1">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body data-invoice-page="list">
+  <div class="announcement">Complimentary delivery across India on orders above ₹1,500</div>
+  <header class="site-header scrolled"><div class="nav shell"><a class="brand" href="index.html" aria-label="Buva home">BU<span>V</span>A</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button><nav class="nav-links" id="main-nav" aria-label="Primary navigation"><a href="index.html">Home</a><a href="service.html">Shop all</a><a href="about.html">Our story</a><a href="contact.html">Chennai</a><a class="account-link" href="#account">Account</a><a class="cart-link nav-cta" href="service.html">Bag <span class="cart-count">0</span></a></nav></div></header>
+  <main class="invoice-page shell">
+    <header class="invoice-page-heading"><div><p class="eyebrow">Your account</p><h1>Invoices</h1><p>Review payment status, order details, and print records for your Buva purchases.</p></div></header>
+    <section class="invoice-state" data-invoice-state aria-live="polite" aria-busy="true">
+      <span class="invoice-loader" aria-hidden="true"></span><p>Loading your invoices…</p>
+    </section>
+    <section class="invoice-list-panel" data-invoice-list hidden>
+      <div class="invoice-table-wrap"><table class="invoice-table"><thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Payment</th><th>Order</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody data-invoice-rows></tbody></table></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="shell"><div class="footer-bottom"><span>© <span data-year></span> Buva Parfums</span><span>Chennai · India</span></div></div></footer>
+  <script src="js/main.js?v=20260926-web1"></script>
+  <script src="js/invoices.js?v=20260926-web1"></script>
+</body>
+</html>

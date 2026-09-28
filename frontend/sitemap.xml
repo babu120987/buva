@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://bhuva.duckdns.org/</loc>
-    <priority>1.0</priority>
-  </url>
-
-  <url>
-    <loc>https://bhuva.duckdns.org/service.html</loc>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://bhuva.duckdns.org/about.html</loc>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://bhuva.duckdns.org/team.html</loc>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://bhuva.duckdns.org/testimonial.html</loc>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://bhuva.duckdns.org/contact.html</loc>
-    <priority>0.7</priority>
-  </url>
-
+  <url><loc>https://buva.shop/</loc></url>
+  <url><loc>https://buva.shop/service.html</loc></url>
+  <url><loc>https://buva.shop/about.html</loc></url>
+  <url><loc>https://buva.shop/team.html</loc></url>
+  <url><loc>https://buva.shop/testimonial.html</loc></url>
+  <url><loc>https://buva.shop/contact.html</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=madurai-jasmine</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=coastal-vetiver</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=rose-oud</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=discovery-wardrobe</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=royal-tuberose</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=midnight-patchouli</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=sandalwood-coast</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=rare-vanilla</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=chennai-after-dark</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=boss-girl</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=gentle-man</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=berry</loc></url>
+  <url><loc>https://buva.shop/product.html?slug=buva-body-mist</loc></url>
 </urlset>

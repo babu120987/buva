@@ -2,7 +2,11 @@
   "name": "buva-ecommerce-api",
   "type": "module",
   "private": true,
+  "scripts": {
+    "check": "node --check server.js && node --check invoices.js && node --check order-emails.js"
+  },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "express": "^4.21.2",
     "google-auth-library": "^11.0.2",
     "multer": "^2.2.0",

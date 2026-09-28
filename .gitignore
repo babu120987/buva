@@ -19,3 +19,10 @@ node_modules/
 .DS_Store
 *.bak
 ngrok.local.yml
+
+# Local snapshots and data exports are not application source.
+*.before-*
+*.save
+buva-before-*.sql
+qdrant-*.tgz
+default.confcd

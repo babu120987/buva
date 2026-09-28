@@ -16,6 +16,8 @@ data:
   DB_NAME: buva
   DB_USER: buva
   PORT: "9000"
+  PUBLIC_SITE_URL: https://buva.shop
+  FIREBASE_PROJECT_ID: buva-90d4b
 ---
 apiVersion: v1
 kind: Service
@@ -179,6 +181,12 @@ spec:
                 secretKeyRef:
                   name: buva-secrets
                   key: RAZORPAY_WEBHOOK_SECRET
+                  optional: true
+            - name: FIREBASE_SERVICE_ACCOUNT_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: buva-firebase
+                  key: service-account.json
                   optional: true
           readinessProbe:
             tcpSocket:

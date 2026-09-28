@@ -4,4 +4,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://bhuva.duckdns.org/sitemap.xml
+Host: buva.shop
+Sitemap: https://buva.shop/sitemap.xml

@@ -4,6 +4,8 @@ services:
     container_name: bhuvanaweb
     ports:
       - "8080:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   webhook:
     build: ./webhook-server

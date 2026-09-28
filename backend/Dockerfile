@@ -6,7 +6,8 @@ COPY package*.json ./
 
 RUN npm ci --omit=dev
 
-COPY server.js ./
+COPY server.js invoices.js order-emails.js ./
+COPY migrations ./migrations
 
 EXPOSE 9000
 

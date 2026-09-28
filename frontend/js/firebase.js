@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCxxoNDwoy2QqPtjN6Sm5Ski2eb_VY_I9I",
+  apiKey: "AIzaSyDzBzP4O033Kohmv5Z7Mo3D6EpILAZGkvY",
   authDomain: "buva-90d4b.firebaseapp.com",
   projectId: "buva-90d4b",
   storageBucket: "buva-90d4b.firebasestorage.app",
@@ -11,5 +11,5 @@ const firebaseConfig = {
   measurementId: "G-VWZFCED685"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+export const firebaseApp = initializeApp(firebaseConfig);
 getAnalytics(firebaseApp);

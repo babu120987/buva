@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Your Invoices — Buva Chennai</title>
+  <link rel="stylesheet" href="css/style.css?v=20260926-web1">
+  <link rel="stylesheet" href="css/invoices.css?v=20260926-1">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body data-invoice-page="auto">
+  <div class="announcement no-print">Complimentary delivery across India on orders above ₹1,500</div>
+  <header class="site-header scrolled no-print"><div class="nav shell"><a class="brand" href="index.html" aria-label="Buva home">BU<span>V</span>A</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button><nav class="nav-links" id="main-nav"><a href="index.html">Home</a><a href="service.html">Shop all</a><a class="account-link" href="#account">Account</a><a class="cart-link nav-cta" href="service.html">Bag <span class="cart-count">0</span></a></nav></div></header>
+  <main class="invoice-page shell">
+    <header class="invoice-page-heading" data-invoice-heading><div><p class="eyebrow">Your purchases</p><h1>Invoices</h1><p>Review payment status, order details, and print records for your Buva purchases.</p></div></header>
+    <div class="invoice-detail-actions no-print" data-invoice-detail-actions hidden><a href="invoice.html">← All invoices</a><button class="button" type="button" data-print-invoice hidden>Print / save PDF</button></div>
+    <section class="invoice-state" data-invoice-state aria-live="polite" aria-busy="true">
+      <span class="invoice-loader" aria-hidden="true"></span><p>Loading invoice…</p>
+    </section>
+    <section class="invoice-list-panel" data-invoice-list hidden>
+      <div class="invoice-table-wrap"><table class="invoice-table"><thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Payment</th><th>Order</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody data-invoice-rows></tbody></table></div>
+    </section>
+    <article class="invoice-document" data-invoice-document hidden></article>
+  </main>
+  <script src="js/main.js?v=20260926-web1"></script>
+  <script src="js/invoices.js?v=20260926-web1"></script>
+</body>
+</html>

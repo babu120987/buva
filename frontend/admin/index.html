@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Buva Admin — Orders</title>
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=20260927-marketing-text">
+  <link rel="stylesheet" href="../css/invoices.css?v=20260926-invoices1">
 </head>
 <body>
   <main>
@@ -28,6 +29,9 @@
         <nav class="section-nav" aria-label="Admin sections">
           <button class="active" type="button" data-admin-view="orders">Orders</button>
           <button type="button" data-admin-view="products">Products</button>
+          <button type="button" data-admin-view="customers">Customers</button>
+          <button type="button" data-admin-view="marketing">Marketing</button>
+          <button type="button" data-admin-view="operations">Reviews & support</button>
         </nav>
         <button class="text-button" type="button" data-logout>Lock dashboard</button>
       </header>
@@ -35,7 +39,7 @@
       <div class="workspace" data-view-panel="orders">
         <div class="page-heading">
           <div><p class="eyebrow">Order management</p><h1>Orders</h1></div>
-          <button class="refresh-button" type="button" data-refresh>Refresh</button>
+          <div><button class="refresh-button" type="button" data-export-orders="csv">Export CSV</button> <button class="refresh-button" type="button" data-export-orders="xlsx">Export Excel</button> <button class="refresh-button" type="button" data-refresh>Refresh</button></div>
         </div>
 
         <section class="stats" aria-label="Order summary">
@@ -66,11 +70,78 @@
 
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
-              <tbody data-orders-body><tr><td colspan="6" class="empty-state">Loading orders…</td></tr></tbody>
+              <thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th><th>Invoice</th></tr></thead>
+              <tbody data-orders-body><tr><td colspan="7" class="empty-state">Loading orders…</td></tr></tbody>
             </table>
           </div>
           <p class="results-note" data-results-note></p>
+        </section>
+      </div>
+
+      <div class="workspace" data-view-panel="customers" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Customer management</p>
+            <h1>Customers</h1>
+          </div>
+          <button class="refresh-button" type="button" data-customer-refresh>Refresh</button>
+        </div>
+
+        <section class="stats" aria-label="Customer summary">
+          <article>
+            <span>Total customers</span>
+            <strong data-customer-stat="totalCustomers">—</strong>
+          </article>
+          <article>
+            <span>Active</span>
+            <strong data-customer-stat="activeCustomers">—</strong>
+          </article>
+          <article>
+            <span>With orders</span>
+            <strong data-customer-stat="customersWithOrders">—</strong>
+          </article>
+          <article>
+            <span>Total spent</span>
+            <strong data-customer-stat="totalSpentPaise">—</strong>
+          </article>
+        </section>
+
+        <section class="orders-panel">
+          <div class="orders-tools">
+            <form class="search" data-customer-search-form>
+              <label class="sr-only" for="customer-search">Search customers</label>
+              <input
+                id="customer-search"
+                name="search"
+                type="search"
+                placeholder="Name, email or phone"
+              >
+              <button type="submit">Search</button>
+            </form>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Orders</th>
+                  <th>Total spent · ₹</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody data-customers-body>
+                <tr>
+                  <td colspan="7" class="empty-state">Loading customers…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="results-note" data-customer-results-note></p>
         </section>
       </div>
 
@@ -111,6 +182,49 @@
           <p class="results-note" data-product-results-note></p>
         </section>
       </div>
+
+      <div class="workspace" data-view-panel="marketing" hidden>
+        <div class="page-heading"><div><p class="eyebrow">Storefront</p><h1>Banners & coupons</h1></div></div>
+        <section class="orders-panel marketing-grid">
+          <form class="admin-form" data-banner-form>
+            <h2>New banner</h2>
+            <input type="hidden" name="id">
+            <label>Title<input name="title" required maxlength="160"></label>
+            <label>Subtitle<input name="subtitle" maxlength="300"></label>
+            <label>Image URL<input name="imageUrl" maxlength="500"></label>
+            <label>Link URL<input name="linkUrl" maxlength="500" value="service.html"></label>
+            <label>Placement<select name="placement"><option value="home">Home</option><option value="shop">Shop</option></select></label>
+            <label>Display order<input name="displayOrder" type="number" value="0"></label>
+            <label>Starts at<input name="startsAt" type="datetime-local"></label>
+            <label>Ends at<input name="endsAt" type="datetime-local"></label>
+            <label><input name="active" type="checkbox" checked> Active</label>
+            <button type="submit" data-banner-submit>Create banner</button><button type="button" data-banner-cancel hidden>Cancel edit</button>
+          </form>
+          <div><h2>Current banners</h2><div data-banners-list class="management-list"></div></div>
+          <form class="admin-form" data-coupon-form>
+            <h2>New coupon</h2>
+            <input type="hidden" name="id">
+            <label>Code<input name="code" required maxlength="40"></label>
+            <label>Type<select name="discountType"><option value="percentage">Percentage</option><option value="fixed">Fixed amount (paise)</option></select></label>
+            <label>Value<input name="discountValue" type="number" min="1" required></label>
+            <label>Minimum order (paise)<input name="minimumOrderPaise" type="number" min="0" value="0"></label>
+            <label>Usage limit<input name="usageLimit" type="number" min="1"></label>
+            <label>Starts at<input name="startsAt" type="datetime-local"></label>
+            <label>Ends at<input name="endsAt" type="datetime-local"></label>
+            <label><input name="active" type="checkbox" checked> Active</label>
+            <button type="submit" data-coupon-submit>Create coupon</button><button type="button" data-coupon-cancel hidden>Cancel edit</button>
+          </form>
+          <div><h2>Coupons</h2><label>Find coupon<input type="search" data-coupon-search placeholder="Search code"></label><div data-coupons-list class="management-list"></div></div>
+        </section>
+      </div>
+
+      <div class="workspace" data-view-panel="operations" hidden>
+        <div class="page-heading"><div><p class="eyebrow">Customer care</p><h1>Reviews & support</h1></div></div>
+        <section class="orders-panel marketing-grid">
+          <div><h2>Review moderation</h2><div data-reviews-list class="management-list"></div></div>
+          <div><h2>Support inbox</h2><div data-support-list class="management-list"></div></div>
+        </section>
+      </div>
     </section>
   </main>
 
@@ -121,7 +235,12 @@
     </aside>
   </div>
 
+  <div class="admin-invoice-shell" data-admin-invoice-shell hidden>
+    <div class="admin-invoice-toolbar no-print"><button type="button" data-admin-invoice-close>← Back to orders</button><button type="button" data-admin-invoice-print>Print / Save PDF</button></div>
+    <article class="invoice-document" data-admin-invoice-document></article>
+  </div>
+
   <div class="toast" data-toast role="status"></div>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=20260927-support-email-status"></script>
 </body>
 </html>
